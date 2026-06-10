@@ -191,15 +191,15 @@ export const CommandPanel: React.FC<CommandPanelProps> = ({
         </div>
 
         {/* コマンド選択可能なアクティブスキルデッキ */}
-        <div className="p-2 bg-zinc-950 border border-zinc-850 rounded-none space-y-1.5" id="selection-deck">
-          <div className="flex items-center justify-between border-b border-zinc-850 pb-1">
+        <div className="p-1.5 bg-zinc-950 border border-zinc-850 rounded-none space-y-1" id="selection-deck">
+          <div className="flex items-center justify-between border-b border-zinc-850 pb-0.5">
             <div>
-              <h4 className="text-[10px] sm:text-xs font-black tracking-widest text-[#fbbf24] uppercase">選択可能なキャラ戦闘スキル</h4>
-              <p className="text-[8px] text-zinc-500 mt-0.5">タップまたはクリックで上記スロットへ順次装填します。</p>
+              <h4 className="text-[9.5px] sm:text-[10px] font-black tracking-widest text-[#fbbf24] uppercase">選択可能なキャラ戦闘スキル</h4>
+              <p className="text-[7.5px] text-zinc-500 mt-0.5">タップまたはクリックで装填</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
             {activeHero.skills.map((skill) => {
               const isSlotA = slotA?.id === skill.id;
               const isSlotB = slotB?.id === skill.id;
@@ -230,30 +230,23 @@ export const CommandPanel: React.FC<CommandPanelProps> = ({
                     }
                   }}
                   disabled={!canAfford}
-                  className={`text-left p-1.5 sm:p-2 rounded-none border text-xs transition-all relative flex flex-col justify-between gap-0.5 cursor-pointer min-h-[46px] sm:min-h-[50px] ${stateClass}`}
+                  className={`text-left p-1 sm:p-1.5 px-2 rounded-none border text-xs transition-all relative flex items-center justify-between gap-1 cursor-pointer min-h-[28px] sm:min-h-[30px] ${stateClass}`}
                 >
-                  <div className="flex justify-between items-center w-full min-w-0 leading-none">
-                    <span className="font-black font-display uppercase tracking-tight text-white flex items-center gap-1 truncate w-9/12">
-                      {getElementIcon(skill.element, 10)}
+                  <div className="flex items-center gap-1 min-w-0 leading-none">
+                    {getElementIcon(skill.element, 10)}
+                    <span className="font-black font-display uppercase tracking-tight text-white truncate text-[11px]">
                       {skill.name}
-                    </span>
-                    <span className="font-mono text-[8px] bg-zinc-950 border border-zinc-805 px-1.5 py-0.2 rounded text-rose-450 font-bold shrink-0">
-                      {skill.mpCost} MP
                     </span>
                   </div>
 
-                  <p className="text-[8.5px] text-zinc-400 leading-tight font-sans line-clamp-1 pr-12">{skill.description}</p>
-                  
-                  {/* 装填状況スロットバッジ */}
-                  <div className="absolute right-1.5 bottom-1 flex gap-0.5 leading-none">
-                    {isSlotA && (
-                      <span className="bg-rose-600 text-white text-[6.5px] font-black px-1.5 py-0.2 rounded leading-none">
-                        A
-                      </span>
-                    )}
-                    {isSlotB && (
-                      <span className="bg-rose-500 text-white text-[6.5px] font-black px-1.5 py-0.2 rounded leading-none">
-                        B
+                  <div className="flex items-center gap-1.5 shrink-0 leading-none">
+                    <span className="font-mono text-[8px] bg-zinc-950 border border-zinc-805 px-1 py-0.2 rounded text-rose-450 font-bold">
+                      {skill.mpCost} MP
+                    </span>
+                    {/* 装填状況スロットバッジ */}
+                    {(isSlotA || isSlotB) && (
+                      <span className="bg-rose-600 text-white text-[6.5px] font-black px-1.5 py-0.2 rounded">
+                        {isSlotA ? 'A' : 'B'}
                       </span>
                     )}
                   </div>
@@ -273,7 +266,7 @@ export const CommandPanel: React.FC<CommandPanelProps> = ({
             <h4 className="text-[8.5px] text-[#fbbf24] font-black uppercase tracking-wider">戦術コンボシミュレータ</h4>
           </div>
 
-          <div className="py-2 flex-1 flex flex-col justify-center min-h-[48px] sm:min-h-[56px]" id="result-status-container">
+          <div className="py-1 flex-1 flex flex-col justify-center min-h-[36px] sm:min-h-[40px]" id="result-status-container">
             <AnimatePresence mode="wait">
               {activeCombo ? (
                 <motion.div
@@ -281,7 +274,7 @@ export const CommandPanel: React.FC<CommandPanelProps> = ({
                   initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  className="space-y-0.5 min-w-0"
+                  className="space-y-0.5 min-w-0 animate-pulse"
                 >
                   <div className="inline-flex items-center gap-0.5 bg-rose-600 text-white px-1.5 py-0.2 text-[7.5px] font-black uppercase tracking-wider border border-white leading-none">
                     ⚡ 連携発動可能 ⚡
@@ -289,7 +282,6 @@ export const CommandPanel: React.FC<CommandPanelProps> = ({
                   <div>
                     <h4 className="text-xs font-black italic uppercase tracking-tighter text-[#fbbf24] font-display leading-none">{activeCombo.name}</h4>
                   </div>
-                  <p className="text-[8px] text-zinc-400 leading-tight font-sans">{activeCombo.description}</p>
                 </motion.div>
               ) : (slotA || slotB) ? (
                 <motion.div
@@ -328,8 +320,8 @@ export const CommandPanel: React.FC<CommandPanelProps> = ({
                 </motion.div>
               ) : (
                 <div className="text-center text-zinc-650 space-y-1 leading-none">
-                  <Play size={12} className="mx-auto stroke-[1.5] text-zinc-700" />
-                  <p className="text-[8px] font-sans text-zinc-500 leading-tight">
+                  <Play size={10} className="mx-auto stroke-[1.5] text-zinc-700" />
+                  <p className="text-[7.5px] font-sans text-zinc-500 leading-tight">
                     コマンド構成でここに自動でプレビュー。
                   </p>
                 </div>
@@ -337,22 +329,19 @@ export const CommandPanel: React.FC<CommandPanelProps> = ({
             </AnimatePresence>
           </div>
         </div>
-
+ 
         {/* コストサマリー・発動ボタン */}
-        <div className="space-y-1.5 pt-1.5 border-t border-zinc-850">
+        <div className="space-y-1 pt-1 border-t border-zinc-850">
           
           {/* 明示的なターゲット標的インジケータ */}
-          <div className="text-[7.5px] font-mono text-zinc-450 flex flex-col gap-0 bg-zinc-950 p-1 px-1.5 border border-zinc-850 truncate leading-tight">
+          <div className="text-[7px] font-mono text-zinc-450 flex flex-col gap-0 bg-zinc-950 p-1 px-1.5 border border-zinc-850 truncate leading-tight mt-0.5">
             <span className="flex items-center gap-1 truncate text-zinc-300">
-              <span className="w-1 h-1 bg-rose-600"></span>攻撃対象: <b>{selectedEnemyName || '自動'}</b>
-            </span>
-            <span className="flex items-center gap-1 truncate text-zinc-300">
-              <span className="w-1 h-1 bg-cyan-500"></span>支援/回復対象: <b>{selectedAllyName || '自身'}</b>
+              <span className="w-1 h-1 bg-rose-600"></span>対象: <b>{selectedEnemyName || '自動'}</b> ＆ 回復: <b>{selectedAllyName || '自身'}</b>
             </span>
           </div>
-
-          <div className="flex justify-between items-center text-[8.5px] font-mono text-zinc-400">
-            <span>消費コスト：</span>
+ 
+          <div className="flex justify-between items-center text-[8px] font-mono text-zinc-400">
+            <span>コスト：</span>
             <div className="flex gap-1.5">
               <span className={hasSufficientMp ? 'text-indigo-400 font-bold' : 'text-rose-500 font-black'}>
                 {requiredMp} MP
@@ -362,52 +351,51 @@ export const CommandPanel: React.FC<CommandPanelProps> = ({
               </span>
             </div>
           </div>
-
+ 
           <div className="relative">
             <button
               onClick={onExecuteTurn}
               disabled={(!slotA && !slotB && !abilityActive) || !hasSufficientMp || !hasSufficientSp}
-              className={`w-full py-2 font-black uppercase text-xs flex justify-center items-center gap-1 transition-all skew-x-[-10deg] tracking-wide relative ${
+              className={`w-full py-1.5 font-black uppercase text-[11px] flex justify-center items-center gap-1 transition-all skew-x-[-10deg] tracking-wide relative ${
                 (!slotA && !slotB && !abilityActive) || !hasSufficientMp || !hasSufficientSp
                   ? 'bg-zinc-800 text-zinc-500 border border-zinc-700 cursor-not-allowed'
                   : activeCombo
                     ? 'bg-gradient-to-r from-rose-600 to-amber-500 text-white border border-white hover:brightness-110 shadow-[0_1px_5px_rgba(225,29,72,0.3)] cursor-pointer font-extrabold'
-                    : 'bg-rose-605 bg-rose-600 hover:bg-rose-500 text-white border border-white cursor-pointer'
+                    : 'bg-rose-600 hover:bg-rose-500 text-white border border-white cursor-pointer'
               }`}
               id="btn-execute-turn"
             >
               <span className="skew-x-[10deg] flex items-center justify-center gap-1">
-                {activeCombo ? '超連携共鳴技を発動！' : '行動を実行する'}
+                {activeCombo ? '連携共鳴技を発動！' : '行動実行'}
               </span>
             </button>
           </div>
-
+ 
           {!hasSufficientMp && (slotA || slotB) && (
-            <p className="text-[8px] text-center text-rose-500 font-bold uppercase tracking-wider block animate-pulse mt-0.5">
-              ※ パーティのMPが不足しています！
+            <p className="text-[7.5px] text-center text-rose-500 font-bold uppercase tracking-wider block animate-pulse mt-0.5">
+              ※ MP不足
             </p>
           )}
-
+ 
           {/* 極意書セクション */}
           <div className="flex gap-1 items-center justify-center pt-1 relative">
             <details className="group w-full">
-              <summary className="w-full flex items-center justify-center gap-1 text-[7.5px] font-black text-zinc-400 group-hover:text-zinc-200 cursor-pointer list-none select-none uppercase">
+              <summary className="w-full flex items-center justify-center gap-1 text-[7px] font-black text-zinc-400 group-hover:text-zinc-200 cursor-pointer list-none select-none uppercase">
                 <BookOpen size={8} className="text-rose-500 animate-pulse" />
-                <span>秘伝連携書レシピを開く ({currentHeroRecipes.length})</span>
+                <span>連携書レシピ ({currentHeroRecipes.length})</span>
               </summary>
-              <div className="absolute bottom-7 right-0 left-0 bg-zinc-950 border-2 border-black p-2.5 rounded-none shadow-2xl z-50 text-[9px] space-y-1.5 mt-0.5 select-none overflow-y-auto max-h-36 text-white border-t-4 border-t-rose-500">
-                <p className="text-[10px] text-rose-500 font-black uppercase border-b border-zinc-850 pb-0.5 flex items-center justify-between">
-                  <span>✨ {activeHero.name} の秘伝書レシピ</span>
+              <div className="absolute bottom-7 right-0 left-0 bg-zinc-950 border-2 border-black p-2 rounded-none shadow-2xl z-50 text-[8.5px] space-y-1 mt-0.5 select-none overflow-y-auto max-h-32 text-white border-t-4 border-t-rose-500">
+                <p className="text-[9px] text-rose-500 font-black uppercase border-b border-zinc-850 pb-0.5 flex items-center justify-between">
+                  <span>✨ {activeHero.name} のレシピ</span>
                 </p>
                 {currentHeroRecipes.map((recipe) => {
                   const sA = activeHero.skills.find(s => s.id === recipe.skillAId)?.name || 'スキルA';
                   const sB = activeHero.skills.find(s => s.id === recipe.skillBId)?.name || 'スキルB';
                   
                   return (
-                    <div key={recipe.id} className="border-b border-zinc-850 pb-1 last:border-b-0 space-y-0.5">
-                      <p className="text-amber-400 font-extrabold text-[9px] uppercase italic">{recipe.name}</p>
-                      <p className="text-zinc-400 leading-tight font-sans">{recipe.description}</p>
-                      <p className="text-[7.5px] font-bold text-rose-500">
+                    <div key={recipe.id} className="border-b border-zinc-850 pb-0.5 last:border-b-0 space-y-0.5 text-left">
+                      <p className="text-amber-400 font-extrabold text-[8.5px] uppercase italic">{recipe.name}</p>
+                      <p className="text-[7.5px] font-bold text-rose-500 leading-none">
                         合成: {sA.split(' ')[0]} ＋ {sB.split(' ')[0]} ＋ 固有能力
                       </p>
                     </div>

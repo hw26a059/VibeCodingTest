@@ -21,6 +21,27 @@ import {
 } from 'lucide-react';
 import { CharacterState, EnemyState, BattleLog, FloatingText, Skill } from './types';
 import { createInitialParty, STAGES, findSpecialCombo, SPECIAL_COMBOS } from './data/gameData';
+
+// Helper to strip English words like "Swift Slash" from names like "瞬斬 (Swift Slash)"
+const cleanEnglishFromText = (str: string) => str.replace(/\s*\([\s\S]*?\)/g, '').trim();
+
+// Clean existing SPECIAL_COMBOS on load safely
+SPECIAL_COMBOS.forEach(combo => {
+  combo.name = cleanEnglishFromText(combo.name);
+});
+
+// Wrap initial party generator to strip English tags on skill and ability names
+const getCleanInitialParty = () => {
+  const party = createInitialParty();
+  party.forEach(hero => {
+    hero.uniqueAbility.name = cleanEnglishFromText(hero.uniqueAbility.name);
+    hero.skills.forEach(skill => {
+      skill.name = cleanEnglishFromText(skill.name);
+    });
+  });
+  return party;
+};
+
 import { BattleScene } from './components/BattleScene';
 import { CommandPanel } from './components/CommandPanel';
 import { LogView } from './components/LogView';
@@ -46,7 +67,7 @@ export default function App() {
   const [masterVolMuted, setMasterVolMuted] = useState(false);
 
   // Core Battle States
-  const [party, setParty] = useState<CharacterState[]>(createInitialParty());
+  const [party, setParty] = useState<CharacterState[]>(getCleanInitialParty());
   const [enemies, setEnemies] = useState<EnemyState[]>([]);
   const [logs, setLogs] = useState<BattleLog[]>([]);
   const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
@@ -124,7 +145,7 @@ export default function App() {
 
   const startCampaign = () => {
     playClickSound();
-    setParty(createInitialParty());
+    setParty(getCleanInitialParty());
     setVictoryCount(0);
     startStage(0);
   };
@@ -132,7 +153,7 @@ export default function App() {
   const triggerReset = () => {
     playClickSound();
     setScreen('title');
-    setParty(createInitialParty());
+    setParty(getCleanInitialParty());
   };
 
   // Helper: Append a new battle log
@@ -886,44 +907,51 @@ export default function App() {
                 enemyTargetId={enemyTargetId}
               />
 
-              {/* Bottom operational controllers console */}
-              {!isEnemyTurn ? (
-                <CommandPanel 
-                  activeHero={activeHero}
-                  slotA={slotA}
-                  slotB={slotB}
-                  abilityActive={abilityActive}
-                  onSetSlotA={handleSetSlotA}
-                  onSetSlotB={handleSetSlotB}
-                  onToggleAbility={handleToggleAbility}
-                  onExecuteTurn={executePlayerTurn}
-                  hasSufficientMp={hasSufficientMp}
-                  hasSufficientSp={hasSufficientSp}
-                  requiredMp={requiredMp}
-                  requiredSp={requiredSp}
-                  selectedEnemyName={currentEnemyTarget?.name || 'Auto'}
-                  selectedAllyName={currentAllyTarget?.name || 'Self'}
-                />
-              ) : (
-                <div className="bg-zinc-900 border-[4px] border-rose-600 rounded-none p-4 flex flex-col items-center justify-center min-h-[120px] sm:min-h-[140px] shadow-xl z-10" id="enemy-turn-block">
-                  <div className="space-y-2 text-center">
-                    <div className="w-8 h-8 border-2 border-rose-600 flex items-center justify-center mx-auto bg-rose-950/20 text-rose-500 font-bold animate-spin-slow">
-                      <Sword size={13} />
+              {/* Bottom operations console & LogView arranged side-by-side on desktop */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-2" id="operation-and-log-console">
+                {/* Left side: CommandPanel (skills / combos) or enemy turn notification */}
+                <div className="md:col-span-8 flex flex-col h-full min-h-0">
+                  {!isEnemyTurn ? (
+                    <CommandPanel 
+                      activeHero={activeHero}
+                      slotA={slotA}
+                      slotB={slotB}
+                      abilityActive={abilityActive}
+                      onSetSlotA={handleSetSlotA}
+                      onSetSlotB={handleSetSlotB}
+                      onToggleAbility={handleToggleAbility}
+                      onExecuteTurn={executePlayerTurn}
+                      hasSufficientMp={hasSufficientMp}
+                      hasSufficientSp={hasSufficientSp}
+                      requiredMp={requiredMp}
+                      requiredSp={requiredSp}
+                      selectedEnemyName={currentEnemyTarget?.name || 'Auto'}
+                      selectedAllyName={currentAllyTarget?.name || 'Self'}
+                    />
+                  ) : (
+                    <div className="bg-zinc-900 border-[4px] border-rose-600 rounded-none p-3 flex flex-col items-center justify-center min-h-[140px] md:h-full shadow-xl z-10" id="enemy-turn-block">
+                      <div className="space-y-1.5 text-center my-auto">
+                        <div className="w-7 h-7 border-2 border-rose-600 flex items-center justify-center mx-auto bg-rose-950/20 text-rose-500 font-bold animate-spin-slow">
+                          <Sword size={11} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] sm:text-xs font-black tracking-widest text-rose-500 uppercase font-accent">Enemy Turn Phase</p>
+                          <p className="text-[8px] text-zinc-400 mt-0.5 uppercase tracking-wider font-sans font-medium leading-normal">The bosses are calculating spells and attacks...</p>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs font-black tracking-widest text-rose-500 uppercase font-accent">Enemy Combat Counter Phase</p>
-                      <p className="text-[9px] text-zinc-400 mt-0.5 uppercase tracking-wider font-sans font-medium leading-normal">Boss forces are currently calculating targeted spells and physics attacks...</p>
-                    </div>
-                  </div>
+                  )}
                 </div>
-              )}
 
-              {/* Battle activity records panel */}
-              <LogView 
-                logs={logs}
-                onResetGame={triggerReset}
-                victoryCount={victoryCount}
-              />
+                {/* Right side: Combat log (LogView) */}
+                <div className="md:col-span-4 flex flex-col h-full min-h-[140px] md:min-h-0">
+                  <LogView 
+                    logs={logs}
+                    onResetGame={triggerReset}
+                    victoryCount={victoryCount}
+                  />
+                </div>
+              </div>
             </motion.div>
           )}
 

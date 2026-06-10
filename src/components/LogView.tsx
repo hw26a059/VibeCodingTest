@@ -33,7 +33,7 @@ export const LogView: React.FC<LogViewProps> = ({ logs, onResetGame, victoryCoun
   };
 
   return (
-    <div className="bg-zinc-900 border-[4px] border-black p-2 sm:p-2 flex flex-col h-24 sm:h-26 rounded-none shadow-xl text-white font-sans border-t-[5px] border-t-zinc-950" id="log-root">
+    <div className="bg-zinc-900 border-[4px] border-black p-2 sm:p-2 flex flex-col h-full md:h-full min-h-[140px] md:min-h-0 rounded-none shadow-xl text-white font-sans border-t-[5px] border-t-zinc-950" id="log-root">
       
       {/* 操作ヘッダー欄 */}
       <div className="flex justify-between items-center pb-1.5 border-b border-zinc-800 shrink-0">
